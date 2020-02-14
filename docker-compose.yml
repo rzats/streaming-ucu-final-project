@@ -32,8 +32,8 @@ services:
       KAFKA_LOG4J_ROOT_LOGLEVEL: WARN
       KAFKA_TOOLS_LOG4J_LOGLEVEL: ERROR
 
-  solar-panel-app:
-    image: ${REGISTRY_URI}/ucu-class/solar-panel-emulator:${STUDENT_NAME}-0.1
+  opensky-provider:
+    image: ${REGISTRY_URI}/ucu-class/opensky-provider:${STUDENT_NAME}-0.1
     depends_on:
       - kafka
     environment:

@@ -66,14 +66,17 @@ envFileName in ThisBuild := ".env"
 
 lazy val root = (project in file("."))
   .settings(name := "streaming-ucu-final-project")
-  .aggregate(solar_panel_emulator, weather_provider, streaming_app)
+  .aggregate(opensky_provider, weather_provider, streaming_app)
 
-lazy val solar_panel_emulator = (project in file("solar-panel-emulator"))
+lazy val opensky_provider = (project in file("opensky-provider"))
   .enablePlugins(sbtdocker.DockerPlugin)
   .settings(
-    name := "solar-panel-emulator",
+    name := "opensky-provider",
     libraryDependencies ++= commonDependencies ++ akkaDependencies ++ Seq(
       // your additional dependencies go here
+      "com.squareup.okhttp3" % "okhttp" % "3.6.0",
+      "com.fasterxml.jackson.core" % "jackson-databind" % "2.9.1",
+      "com.google.code.gson" % "gson" % "2.8.6"
     ),
     dockerSettings()
   )
