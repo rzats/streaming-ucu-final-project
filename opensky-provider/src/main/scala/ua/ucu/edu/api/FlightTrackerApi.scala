@@ -34,12 +34,12 @@ class FlightTrackerApi {
       case (city, bbox) =>
         logger.info(s"Calling API for $city")
         val response: OpenSkyStates = api.getStates(0, null, bbox)
-        if (response == null)
+        if (response == null || response.getStates == null)
           logger.info("Got response with 0 states")
         else
           logger.info(s"Got response with ${response.getStates.size} states")
         val cityStates: List[FlightTrackerState] =
-          if (response == null) List()
+          if (response == null || response.getStates == null) List()
           else response.getStates.asScala.toList.map(state => FlightTrackerState(
             response.getTime,
             state.getLatitude,

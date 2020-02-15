@@ -24,6 +24,9 @@ object DummyStreamingApp extends App {
 
   implicit val flightTrackerSerde: FlightTrackerStateSerde = new FlightTrackerStateSerde
 
+  logger.info(s"Waiting for Kafka topics to be created...")
+  Thread.sleep(15 * 1000)
+
   val builder = new StreamsBuilder
 
   val openSkyStream = builder.stream[String, FlightTrackerState]("opensky_data")
