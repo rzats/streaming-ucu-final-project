@@ -4,11 +4,9 @@ import org.opensky.api.OpenSkyApi
 import org.opensky.api.OpenSkyApi.BoundingBox
 import org.opensky.model.OpenSkyStates
 import org.slf4j.{Logger, LoggerFactory}
-import ua.ucu.edu.kafka.DummyDataProducer.getClass
 import ua.ucu.edu.model.FlightTrackerState
 
 import scala.collection.JavaConverters._
-import scala.collection.mutable.ListBuffer
 
 class FlightTrackerApi {
 
@@ -33,8 +31,7 @@ class FlightTrackerApi {
   )
 
   def getStates: List[FlightTrackerState] = {
-    val flightTrackerStates = new ListBuffer[FlightTrackerState]()
-    cities.foreach {
+    val flightTrackerStates = cities.flatMap {
       case (city, bbox) =>
         logger.info(s"Calling API for $city")
         val response: OpenSkyStates = api.getStates(0, null, bbox)
@@ -42,19 +39,20 @@ class FlightTrackerApi {
           logger.info("Got response with 0 states")
         else
           logger.info(s"Got response with ${response.getStates.size} states")
-        val cityStates: List[FlightTrackerState] = if (response == null) List() else response.getStates.asScala.toList.map(state => FlightTrackerState(
-          response.getTime,
-          state.getLatitude,
-          state.getLongitude,
-          city,
-          state.getCallsign,
-          state.getOriginCountry
-        ))
-        logger.info(s"Processed ${cityStates.size} states")
-        flightTrackerStates ++= cityStates
-        logger.info(s"Total: ${flightTrackerStates.size}")
+        val cityStates: List[FlightTrackerState] =
+          if (response == null) List()
+          else response.getStates.asScala.toList.map(state => FlightTrackerState(
+            response.getTime,
+            state.getLatitude,
+            state.getLongitude,
+            city,
+            state.getCallsign,
+            state.getOriginCountry
+          ))
         Thread.sleep(6 * 1000)
+        cityStates
     }
+    logger.info(s"Total: ${flightTrackerStates.size} states")
     flightTrackerStates.toList
   }
 }
