@@ -7,6 +7,7 @@ import org.apache.kafka.streams.scala.ImplicitConversions._
 import org.apache.kafka.streams.scala._
 import org.apache.kafka.streams.{KafkaStreams, StreamsConfig}
 import org.slf4j.LoggerFactory
+import ua.ucu.edu.model.{FlightTrackerState, FlightTrackerStateSerde}
 
 // dummy app for testing purposes
 object DummyStreamingApp extends App {
@@ -21,7 +22,17 @@ object DummyStreamingApp extends App {
 
   import Serdes._
 
+  implicit val flightTrackerSerde: FlightTrackerStateSerde = new FlightTrackerStateSerde
+
   val builder = new StreamsBuilder
+
+  val openSkyStream = builder.stream[String, FlightTrackerState]("opensky_data")
+
+  openSkyStream.foreach { (k, v) =>
+    logger.info(s"record processed $k->$v")
+  }
+
+  openSkyStream.mapValues(_.toString).to("test_topic_out")
 
   val testStream = builder.stream[String, String]("weather_data")
 

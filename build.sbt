@@ -13,6 +13,11 @@ ThisBuild / scalacOptions ++= Seq(
 
 val akkaVersion = "2.5.20"
 
+assemblyMergeStrategy in assembly := {
+  case PathList("META-INF", _*) => MergeStrategy.discard
+  case _ => MergeStrategy.first
+}
+
 val commonDependencies = Seq(
   "org.apache.kafka" %% "kafka" % "2.1.0" withSources()
     exclude("org.slf4j","slf4j-log4j12")
@@ -75,8 +80,8 @@ lazy val opensky_provider = (project in file("opensky-provider"))
     libraryDependencies ++= commonDependencies ++ akkaDependencies ++ Seq(
       // your additional dependencies go here
       "com.squareup.okhttp3" % "okhttp" % "3.6.0",
-      "com.fasterxml.jackson.core" % "jackson-databind" % "2.9.1",
-      "com.google.code.gson" % "gson" % "2.8.6"
+      "com.fasterxml.jackson.module" % "jackson-module-scala_2.12" % "2.9.7"
+      // "com.google.code.gson" % "gson" % "2.8.6"
     ),
     dockerSettings()
   )
@@ -92,6 +97,7 @@ lazy val weather_provider = (project in file("weather-provider"))
   )
 
 lazy val streaming_app = (project in file("streaming-app"))
+  .dependsOn(opensky_provider)
   .enablePlugins(sbtdocker.DockerPlugin)
   .settings(
     name := "streaming-app",
