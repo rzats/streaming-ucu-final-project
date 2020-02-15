@@ -13,12 +13,26 @@ owm = pyowm.OWM(MY_API_KEY)
 KAFKA_BROKERS = 'KAFKA_BROKERS'
 TOPIC = 'weather_data'
 
-broker_list = os.getenv(KAFKA_BROKERS).split(',')
-producer = KafkaProducer(
-    bootstrap_servers=broker_list,
-    client_id='weather-provider'
-    value_serializer=lambda x: dumps(x).encode('utf-8')
-)
+# sleep(30)
+broker_list = os.getenv(KAFKA_BROKERS)
+print('*'*30)
+print(broker_list)
+print('*'*30)
+connected = False
+while not connected:
+    try:
+        producer = KafkaProducer(
+            bootstrap_servers=broker_list,
+            client_id='weather-provider',
+            value_serializer=lambda x: dumps(x).encode('utf-8')
+        )
+        connected = True
+        print('Connected!')
+        sleep(5)
+    except Exception:
+        print("Retry")
+        sleep(2)
+
 
 NUM_CITIES = 10
 CITIES = ['London', 'Munich', 'Warsaw', 'Prague', 'Paris',
@@ -39,5 +53,6 @@ while True:
     except OWMError:
         data = CACHE[city]
 
-    producer.send(TOPIC, value=data)
+    print('Sending: ', data)
+    producer.send(TOPIC, value=data, acks=0)
     sleep(2)
