@@ -16,7 +16,6 @@ class FlightTrackerApi {
   val api = new OpenSkyApi("rzatserkovnyi", "Bh2LZa6Wim3mUXF")
 
   // London, Munich, Warsaw, Prague, Paris, Brussels, Amsterdam, Madrid, Barcelona, Rome
-  val bbox = new BoundingBox(49, 54, 14, 25)
   val cities: Map[String, BoundingBox] = Map(
     "London" -> new BoundingBox(51.1839, 51.8324, -0.7868, 0.4748),
     "Munich" -> new BoundingBox(47.8514, 48.5735, 10.9110, 12.0123),
@@ -49,6 +48,7 @@ class FlightTrackerApi {
             state.getCallsign,
             state.getOriginCountry
           ))
+        // Prevent API throttling
         Thread.sleep(6 * 1000)
         cityStates
     }
