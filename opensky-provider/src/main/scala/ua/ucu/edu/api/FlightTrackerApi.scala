@@ -53,7 +53,7 @@ class FlightTrackerApi {
         logger.info(s"Processed ${cityStates.size} states")
         flightTrackerStates ++= cityStates
         logger.info(s"Total: ${flightTrackerStates.size}")
-        Thread.sleep(1 * 1000)
+        Thread.sleep(6 * 1000)
     }
     flightTrackerStates.toList
   }

@@ -7,13 +7,11 @@ import org.slf4j.{Logger, LoggerFactory}
 import ua.ucu.edu.api.FlightTrackerApi
 import ua.ucu.edu.model.FlightTrackerState
 
-// delete_me - for testing purposes
-object DummyDataProducer {
+object DataProducer {
 
   val logger: Logger = LoggerFactory.getLogger(getClass)
 
-  // This is just for testing purposes
-  def pushTestData(): Unit = {
+  def pushFlightTrackerStates(): Unit = {
     val BrokerList: String = System.getenv(Config.KafkaBrokers)
     val Topic = "opensky_data"
 
@@ -37,8 +35,6 @@ object DummyDataProducer {
         val data = new ProducerRecord[String, FlightTrackerState](Topic, state)
         producer.send(data)
       }
-
-      Thread.sleep(30 * 1000)
     }
 
     producer.close()
