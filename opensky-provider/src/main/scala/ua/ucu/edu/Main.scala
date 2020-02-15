@@ -1,8 +1,7 @@
 package ua.ucu.edu
 
-import ua.ucu.edu.kafka.DummyDataProducer
+import ua.ucu.edu.kafka.DataProducer
 
 object Main extends App {
-
-  DummyDataProducer.pushFlightTrackerStates()
+  DataProducer.pushFlightTrackerStates()
 }
