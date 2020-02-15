@@ -56,7 +56,7 @@ while True:
 
     try:
         print('Sending: ', data)
-        producer.send(TOPIC, value=data)
+        producer.send(TOPIC, value=data, city)
     except KafkaTimeoutError:
         print("Timeout")
         continue
