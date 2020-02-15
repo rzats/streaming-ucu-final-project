@@ -62,6 +62,40 @@ def dockerSettings(debugPort: Option[Int] = None) = Seq(
   )
 )
 
+//FROM python:3
+//
+//COPY ./foo/requirements.txt /
+//  COPY ./foo/weather_provider.py /
+//
+//RUN pip install --no-cache-dir -r ./requirements.txt
+//
+//
+//CMD [ "python", "./weather_provider.py" ]
+
+
+def dockerSettingsPython(debugPort: Option[Int] = None) = Seq(
+  dockerfile in docker := {
+    val scriptSourceDir = baseDirectory.value / "../owm-weather-provider/code"
+    val projectDir = "/project/"
+    new Dockerfile {
+      from("python:3")
+      copy(scriptSourceDir, projectDir)
+      workDir("/project")
+      run("pip", "install", "-r", "requirements.txt")
+      cmd("python", "owm_producer.py" )
+    }
+  },
+  imageNames in docker := Seq(
+    ImageName(
+      registry = Some(sys.env("REGISTRY_URI")),
+      namespace = Some("ucu-class"),
+      repository = name.value,
+      tag = Some(s"${sys.env("STUDENT_NAME")}-${version.value}")
+    )
+    //    , ImageName(s"rickerlyman/${name.value}:latest")
+  )
+)
+
 envFileName in ThisBuild := ".env"
 
 lazy val root = (project in file("."))
@@ -81,14 +115,11 @@ lazy val opensky_provider = (project in file("opensky-provider"))
     dockerSettings()
   )
 
-lazy val weather_provider = (project in file("weather-provider"))
+lazy val weather_provider = (project in file("owm-weather-provider"))
   .enablePlugins(sbtdocker.DockerPlugin)
   .settings(
     name := "weather-provider",
-    libraryDependencies ++= commonDependencies ++ akkaDependencies ++ Seq(
-      // your additional dependencies go here
-    ),
-    dockerSettings()
+    dockerSettingsPython()
   )
 
 lazy val streaming_app = (project in file("streaming-app"))
