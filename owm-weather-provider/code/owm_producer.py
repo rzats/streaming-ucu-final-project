@@ -1,6 +1,6 @@
 import os
 from time import sleep
-from json import dumps
+from json import dumps, loads
 from kafka import KafkaProducer
 import pyowm
 from pyowm.exceptions import OWMError
@@ -48,7 +48,7 @@ while True:
     try:
         observation = owm.weather_at_place(city)
         w = observation.get_weather()
-        data = {city: w.to_JSON()}
+        data = loads(w.to_JSON())
 
         CACHE[city] = data
 
@@ -57,11 +57,11 @@ while True:
 
     try:
         message = {
-            "weather_main": data["weather"]["main"],
-            "weather_description": data["weather"]["description"],
-            "temp": data["main"]["temp"],
-            "pressure": data["main"]["pressure"],
-            "humidity": data["main"]["humidity"],
+            "weather_main": data["status"],
+            "weather_description": data["detailed_status"],
+            "temp": data["temperature"]["temp"],
+            "pressure": data["pressure"]["press"],
+            "humidity": data["humidity"],
             "wind_speed": data["wind"]["speed"]
         }
         print('Sending: ', message)
