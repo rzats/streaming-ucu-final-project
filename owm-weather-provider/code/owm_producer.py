@@ -25,6 +25,7 @@ while not connected:
         producer = KafkaProducer(
             bootstrap_servers=broker_list,
             client_id='weather-provider',
+            key_serializer=lambda x: bytes(x, "UTF-8"),
             value_serializer=lambda x: dumps(x).encode('utf-8')
         )
         connected = True
@@ -55,8 +56,16 @@ while True:
         data = CACHE[city]
 
     try:
-        print('Sending: ', data)
-        producer.send(TOPIC, value=data, city)
+        message = {
+            "weather_main": data["weather"]["main"],
+            "weather_description": data["weather"]["description"],
+            "temp": data["main"]["temp"],
+            "pressure": data["main"]["pressure"],
+            "humidity": data["main"]["humidity"],
+            "wind_speed": data["wind"]["speed"]
+        }
+        print('Sending: ', message)
+        producer.send(TOPIC, value=message, key=city)
     except KafkaTimeoutError:
         print("Timeout")
         continue
