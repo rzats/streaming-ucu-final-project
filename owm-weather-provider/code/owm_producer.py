@@ -4,6 +4,7 @@ from json import dumps
 from kafka import KafkaProducer
 import pyowm
 from pyowm.exceptions import OWMError
+from kafka.errors import KafkaTimeoutError
 import random
 
 
@@ -53,6 +54,10 @@ while True:
     except OWMError:
         data = CACHE[city]
 
-    print('Sending: ', data)
-    producer.send(TOPIC, value=data)
+    try:
+        print('Sending: ', data)
+        producer.send(TOPIC, value=data)
+    except KafkaTimeoutError:
+        print("Timeout")
+        continue
     sleep(2)
