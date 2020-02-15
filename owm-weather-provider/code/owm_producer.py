@@ -54,5 +54,5 @@ while True:
         data = CACHE[city]
 
     print('Sending: ', data)
-    producer.send(TOPIC, value=data, acks=0)
+    producer.send(TOPIC, value=data)
     sleep(2)
