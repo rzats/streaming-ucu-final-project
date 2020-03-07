@@ -65,7 +65,7 @@ while True:
             "wind_speed": data["wind"]["speed"]
         }
         print('Sending: ', message)
-        producer.send(TOPIC, value=message, key=city)
+        producer.send(TOPIC, value=message, key=city, partition=idx)
     except KafkaTimeoutError:
         print("Timeout")
         continue
