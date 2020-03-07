@@ -29,7 +29,7 @@ object DummyStreamingApp extends App {
   implicit val jointStateSerde: JointStateSerde = new JointStateSerde
 
   logger.info(s"Waiting for Kafka topics to be created...")
-  Thread.sleep(15 * 1000)
+  Thread.sleep(30 * 1000)
 
   val builder = new StreamsBuilder
 
@@ -47,12 +47,12 @@ object DummyStreamingApp extends App {
     logger.info(s"record processed $k->$v")
   }
 
-  val outStream: KStream[String, JointState] = openSkyStream.outerJoin(weatherStream)(
+  val outStream: KStream[String, JointState] = openSkyStream.join(weatherStream)(
     (fs, ws) => JointState(fs, ws),
     JoinWindows.of(5000)
   )
 
-  weatherStream.foreach { (k, v) =>
+  outStream.foreach { (k, v) =>
     logger.info(s"joined result $k->$v")
   }
 
