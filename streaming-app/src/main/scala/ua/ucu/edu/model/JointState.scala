@@ -18,18 +18,25 @@ case class JointState(
 )
 
 object JointState {
-  def apply(fs: FlightTrackerState, ws: WeatherState): JointState = JointState(
-    fs.timestamp,
-    fs.latitude,
-    fs.longitude,
-    fs.city,
-    fs.callsign,
-    fs.originCountry,
-    ws.weather_main,
-    ws.weather_description,
-    ws.temp,
-    ws.pressure,
-    ws.humidity,
-    ws.wind_speed
-  )
+  def apply(fs: FlightTrackerState, ws: WeatherState): JointState = {
+    println()
+    println(fs)
+    println(ws)
+    println()
+
+    JointState(
+      fs.timestamp,
+      fs.latitude,
+      fs.longitude,
+      fs.city,
+      fs.callsign,
+      fs.originCountry,
+      ws.weather_main,
+      ws.weather_description,
+      ws.temp,
+      ws.pressure,
+      ws.humidity,
+      ws.wind_speed
+    )
+  }
 }
