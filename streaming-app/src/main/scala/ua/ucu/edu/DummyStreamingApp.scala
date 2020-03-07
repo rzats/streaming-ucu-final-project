@@ -3,11 +3,13 @@ package ua.ucu.edu
 import java.util.Properties
 import java.util.concurrent.TimeUnit
 
+import org.apache.kafka.streams.kstream.JoinWindows
 import org.apache.kafka.streams.scala.ImplicitConversions._
 import org.apache.kafka.streams.scala._
+import org.apache.kafka.streams.scala.kstream.KStream
 import org.apache.kafka.streams.{KafkaStreams, StreamsConfig}
 import org.slf4j.LoggerFactory
-import ua.ucu.edu.model.{FlightTrackerState, FlightTrackerStateSerde}
+import ua.ucu.edu.model._
 
 // dummy app for testing purposes
 object DummyStreamingApp extends App {
@@ -23,13 +25,15 @@ object DummyStreamingApp extends App {
   import Serdes._
 
   implicit val flightTrackerSerde: FlightTrackerStateSerde = new FlightTrackerStateSerde
+  implicit val weatherStateSerde: WeatherStateSerde = new WeatherStateSerde
+  implicit val jointStateSerde: JointStateSerde = new JointStateSerde
 
   logger.info(s"Waiting for Kafka topics to be created...")
   Thread.sleep(15 * 1000)
 
   val builder = new StreamsBuilder
 
-  val openSkyStream = builder.stream[String, FlightTrackerState]("opensky_data")
+  val openSkyStream: KStream[String, FlightTrackerState] = builder.stream[String, FlightTrackerState]("opensky_data")
 
   openSkyStream.foreach { (k, v) =>
     logger.info(s"record processed $k->$v")
@@ -37,13 +41,22 @@ object DummyStreamingApp extends App {
 
   openSkyStream.mapValues(_.toString).to("test_topic_out")
 
-  val testStream = builder.stream[String, String]("weather_data")
+  val weatherStream: KStream[String, WeatherState] = builder.stream[String, WeatherState]("weather_data")
 
-  testStream.foreach { (k, v) =>
+  weatherStream.foreach { (k, v) =>
     logger.info(s"record processed $k->$v")
   }
 
-  testStream.to("test_topic_out")
+  val outStream: KStream[String, JointState] = openSkyStream.outerJoin(weatherStream)(
+    (fs, ws) => JointState(fs, ws),
+    JoinWindows.of(5000)
+  )
+
+  weatherStream.foreach { (k, v) =>
+    logger.info(s"joined result $k->$v")
+  }
+
+  outStream.to("test_topic_out")
 
   val streams = new KafkaStreams(builder.build(), props)
   streams.cleanUp()
@@ -56,4 +69,5 @@ object DummyStreamingApp extends App {
   object Config {
     val KafkaBrokers = "KAFKA_BROKERS"
   }
+
 }
