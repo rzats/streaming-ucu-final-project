@@ -9,6 +9,7 @@ import org.apache.kafka.streams.scala._
 import org.apache.kafka.streams.scala.kstream.KStream
 import org.apache.kafka.streams.{KafkaStreams, StreamsConfig}
 import org.slf4j.LoggerFactory
+import ua.ucu.edu.common.SimpleJsonSerde
 import ua.ucu.edu.model._
 
 // dummy app for testing purposes
@@ -24,12 +25,12 @@ object DummyStreamingApp extends App {
 
   import Serdes._
 
-  implicit val flightTrackerSerde: FlightTrackerStateSerde = new FlightTrackerStateSerde
-  implicit val weatherStateSerde: WeatherStateSerde = new WeatherStateSerde
-  implicit val jointStateSerde: JointStateSerde = new JointStateSerde
+  implicit val flightTrackerSerde: SimpleJsonSerde[FlightTrackerState] = new SimpleJsonSerde[FlightTrackerState]
+  implicit val weatherStateSerde: SimpleJsonSerde[WeatherState] = new SimpleJsonSerde[WeatherState]
+  implicit val jointStateSerde: SimpleJsonSerde[JointState] = new SimpleJsonSerde[JointState]
 
   logger.info(s"Waiting for Kafka topics to be created...")
-  Thread.sleep(15 * 1000)
+  Thread.sleep(30 * 1000)
 
   val builder = new StreamsBuilder
 
@@ -47,7 +48,7 @@ object DummyStreamingApp extends App {
     logger.info(s"record processed $k->$v")
   }
 
-  val outStream: KStream[String, JointState] = openSkyStream.outerJoin(weatherStream)(
+  val outStream: KStream[String, JointState] = openSkyStream.join(weatherStream)(
     (fs, ws) => JointState(fs, ws),
     JoinWindows.of(5000)
   )
