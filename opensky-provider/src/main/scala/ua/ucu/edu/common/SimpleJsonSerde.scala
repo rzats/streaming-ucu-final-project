@@ -5,7 +5,6 @@ import java.util
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import org.apache.kafka.common.serialization.{Deserializer, Serde, Serializer}
-import ua.ucu.edu.model.FlightTrackerState
 
 class SimpleJsonSerializer[T >: Null]() extends Serializer[T] {
   private val mapper = new ObjectMapper()
