@@ -53,7 +53,7 @@ object DummyStreamingApp extends App {
     JoinWindows.of(5000)
   )
 
-  weatherStream.foreach { (k, v) =>
+  outStream.foreach { (k, v) =>
     logger.info(s"joined result $k->$v")
   }
 
