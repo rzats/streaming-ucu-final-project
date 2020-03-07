@@ -1,4 +1,4 @@
-package ua.ucu.edu.common
+package ua.ucu.edu.model
 
 import java.util
 
@@ -6,29 +6,29 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import org.apache.kafka.common.serialization.{Deserializer, Serde, Serializer}
 
-class SimpleJsonSerializer[T >: Null]() extends Serializer[T] {
+class WeatherStateSerializer() extends Serializer[WeatherState] {
   private val mapper = new ObjectMapper()
   mapper.registerModule(DefaultScalaModule)
 
   override def configure(configs: util.Map[String, _], isKey: Boolean): Unit = {}
 
-  override def serialize(topic: String, data: T): Array[Byte] =
+  override def serialize(topic: String, data: WeatherState): Array[Byte] =
     mapper.writeValueAsBytes(data)
 
   override def close(): Unit = {}
 }
 
-class SimpleJsonDeserializer[T >: Null]() extends Deserializer[T] {
+class WeatherStateDeserializer() extends Deserializer[WeatherState] {
   private val mapper = new ObjectMapper()
   mapper.registerModule(DefaultScalaModule)
 
   override def configure(configs: util.Map[String, _], isKey: Boolean): Unit = {}
 
-  override def deserialize(topic: String, data: Array[Byte]): T = data match {
+  override def deserialize(topic: String, data: Array[Byte]): WeatherState = data match {
     case null => null
     case _ =>
       try {
-        mapper.readValue(data, classOf[T])
+        mapper.readValue(data, classOf[WeatherState])
       } catch {
         case _: Exception => null
       }
@@ -37,13 +37,12 @@ class SimpleJsonDeserializer[T >: Null]() extends Deserializer[T] {
   override def close(): Unit = {}
 }
 
-class SimpleJsonSerde[T >: Null] extends Serde[T] {
+class WeatherStateSerde extends Serde[WeatherState] {
   override def configure(configs: util.Map[String, _], isKey: Boolean): Unit = {}
 
   override def close(): Unit = {}
 
-  override def serializer(): Serializer[T] = new SimpleJsonSerializer[T]()
+  override def serializer(): Serializer[WeatherState] = new WeatherStateSerializer()
 
-  override def deserializer(): Deserializer[T] = new SimpleJsonDeserializer[T]()
+  override def deserializer(): Deserializer[WeatherState] = new WeatherStateDeserializer()
 }
-

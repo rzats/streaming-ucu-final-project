@@ -9,7 +9,6 @@ import org.apache.kafka.streams.scala._
 import org.apache.kafka.streams.scala.kstream.KStream
 import org.apache.kafka.streams.{KafkaStreams, StreamsConfig}
 import org.slf4j.LoggerFactory
-import ua.ucu.edu.common.SimpleJsonSerde
 import ua.ucu.edu.model._
 
 // dummy app for testing purposes
@@ -25,9 +24,9 @@ object DummyStreamingApp extends App {
 
   import Serdes._
 
-  implicit val flightTrackerSerde: SimpleJsonSerde[FlightTrackerState] = new SimpleJsonSerde[FlightTrackerState]
-  implicit val weatherStateSerde: SimpleJsonSerde[WeatherState] = new SimpleJsonSerde[WeatherState]
-  implicit val jointStateSerde: SimpleJsonSerde[JointState] = new SimpleJsonSerde[JointState]
+  implicit val flightTrackerSerde = new FlightTrackerStateSerde
+  implicit val weatherStateSerde = new WeatherStateSerde
+  implicit val jointStateSerde = new JointStateSerde
 
   logger.info(s"Waiting for Kafka topics to be created...")
   Thread.sleep(30 * 1000)
