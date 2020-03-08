@@ -41,9 +41,9 @@ services:
       - kafka
     command: "bash -c 'echo Waiting for Kafka to be ready... && \
                        cub kafka-ready -b kafka:9092 1 40 && \
-                       kafka-topics --create --if-not-exists --zookeeper zookeeper:2181 --partitions 10 --replication-factor 1 --topic opensky_data && \
-                       kafka-topics --create --if-not-exists --zookeeper zookeeper:2181 --partitions 10 --replication-factor 1 --topic weather_data && \
-                       kafka-topics --create --if-not-exists --zookeeper zookeeper:2181 --partitions 10 --replication-factor 1 --topic test_topic_out'"
+                       kafka-topics --create --if-not-exists --zookeeper zookeeper:2181 --partitions 1 --replication-factor 1 --topic opensky_data && \
+                       kafka-topics --create --if-not-exists --zookeeper zookeeper:2181 --partitions 1 --replication-factor 1 --topic weather_data && \
+                       kafka-topics --create --if-not-exists --zookeeper zookeeper:2181 --partitions 1 --replication-factor 1 --topic test_topic_out'"
     environment:
       # The following settings are listed here only to satisfy the image's requirements.
       # We override the image's `command` anyways, hence this container will not start a broker.
@@ -78,6 +78,8 @@ services:
 
   plotter:
     image: ${REGISTRY_URI}/ucu-class/plotter:${STUDENT_NAME}-0.1
+    ports:
+      - "8050:8050"
     depends_on:
       - kafka
       - streaming-app

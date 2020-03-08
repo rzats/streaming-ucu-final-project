@@ -32,7 +32,8 @@ object DataProducer {
       val states = flightTrackerApi.getStates
       for (state <- states) {
         logger.info(s"[$Topic] ${state.city} -> $state")
-        val data = new ProducerRecord[String, FlightTrackerState](Topic, FlightTrackerApi.cities.keys.toList.indexOf(state.city), state.city, state)
+        val data = new ProducerRecord[String, FlightTrackerState](Topic, state.city, state)
+//        val data = new ProducerRecord[String, FlightTrackerState](Topic, FlightTrackerApi.cities.keys.toList.indexOf(state.city), state.city, state)
         producer.send(data)
       }
     }

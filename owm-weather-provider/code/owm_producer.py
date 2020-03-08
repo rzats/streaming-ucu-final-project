@@ -69,7 +69,8 @@ while True:
         }
 
         print('Sending: {} -> {}'.format(city, message))
-        producer.send(TOPIC, value=message, key=city, partition=idx)
+        producer.send(TOPIC, value=message, key=city)
+#         producer.send(TOPIC, value=message, key=city, partition=idx)
     except KafkaTimeoutError:
         print("Timeout")
         continue

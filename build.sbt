@@ -98,6 +98,7 @@ def dockerSettingsPlotter(debugPort: Option[Int] = None) = Seq(
       copy(scriptSourceDir, projectDir)
       workDir("/project")
       run("pip", "install", "-r", "requirements.txt")
+      expose(8050)
       cmd("python", "plotter.py" )
     }
   },
