@@ -19,11 +19,6 @@ case class JointState(
 
 object JointState {
   def apply(fs: FlightTrackerState, ws: WeatherState): JointState = {
-    println()
-    println(fs)
-    println(ws)
-    println()
-
     JointState(
       fs.timestamp,
       fs.latitude,

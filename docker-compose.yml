@@ -58,25 +58,30 @@ services:
       KAFKA_BROKERS: kafka:9092
       ZK_CONNECT: zookeeper:2181
 
-  streaming-app:
-    image: ${REGISTRY_URI}/ucu-class/streaming-app:${STUDENT_NAME}-0.1
-    depends_on:
-      - kafka
-    environment:
-      KAFKA_BROKERS: kafka:9092
-
   weather-provider:
     image: ${REGISTRY_URI}/ucu-class/weather-provider:${STUDENT_NAME}-0.1
     depends_on:
       - kafka
     environment:
+      PYTHONUNBUFFERED: 1
       KAFKA_BROKERS: kafka:9092
       ZK_CONNECT: zookeeper:2181
 
-#  weather-provider:
-#    image: ${REGISTRY_URI}/ucu-class/weather-provider:${STUDENT_NAME}-0.1
-#    depends_on:
-#      - kafka
-#    environment:
-#      KAFKA_BROKERS: kafka:9092
-#      ZK_CONNECT: zookeeper:2181
+  streaming-app:
+    image: ${REGISTRY_URI}/ucu-class/streaming-app:${STUDENT_NAME}-0.1
+    depends_on:
+      - kafka
+      - opensky-provider
+      - weather-provider
+    environment:
+      KAFKA_BROKERS: kafka:9092
+
+  plotter:
+    image: ${REGISTRY_URI}/ucu-class/plotter:${STUDENT_NAME}-0.1
+    depends_on:
+      - kafka
+      - streaming-app
+    environment:
+      PYTHONUNBUFFERED: 1
+      KAFKA_BROKERS: kafka:9092
+      ZK_CONNECT: zookeeper:2181

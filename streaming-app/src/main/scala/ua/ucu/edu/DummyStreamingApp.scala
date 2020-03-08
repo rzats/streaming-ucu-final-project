@@ -39,7 +39,6 @@ object DummyStreamingApp extends App {
     logger.info(s"record processed $k->$v")
   }
 
-  openSkyStream.mapValues(_.toString).to("test_topic_out")
 
   val weatherStream: KStream[String, WeatherState] = builder.stream[String, WeatherState]("weather_data")
 
@@ -49,7 +48,7 @@ object DummyStreamingApp extends App {
 
   val outStream: KStream[String, JointState] = openSkyStream.join(weatherStream)(
     (fs, ws) => JointState(fs, ws),
-    JoinWindows.of(5000)
+    JoinWindows.of(15000)
   )
 
   outStream.foreach { (k, v) =>

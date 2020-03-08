@@ -6,7 +6,7 @@ import pyowm
 from pyowm.exceptions import OWMError
 from kafka.errors import KafkaTimeoutError
 import random
-
+import sys
 
 MY_API_KEY = os.getenv('OWM_API_KEY', '88df1c42c33bad002f03400df389352e')
 owm = pyowm.OWM(MY_API_KEY)
@@ -14,11 +14,8 @@ owm = pyowm.OWM(MY_API_KEY)
 KAFKA_BROKERS = 'KAFKA_BROKERS'
 TOPIC = 'weather_data'
 
-# sleep(30)
+sleep(10)
 broker_list = os.getenv(KAFKA_BROKERS)
-print('*'*30)
-print(broker_list)
-print('*'*30)
 connected = False
 while not connected:
     try:
@@ -39,6 +36,12 @@ while not connected:
 NUM_CITIES = 10
 CITIES = ['London', 'Munich', 'Warsaw', 'Prague', 'Paris',
           'Brussels', 'Amsterdam', 'Madrid', 'Barcelona', 'Rome']
+
+
+print('\n'*10)
+print("Started producing!")
+print('\n'*10)
+
 
 CACHE = {}
 while True:
@@ -64,9 +67,12 @@ while True:
             "humidity": data["humidity"],
             "wind_speed": data["wind"]["speed"]
         }
-        print('Sending: ', message)
+
+        print('Sending: {} -> {}'.format(city, message))
         producer.send(TOPIC, value=message, key=city, partition=idx)
     except KafkaTimeoutError:
         print("Timeout")
         continue
     sleep(2)
+
+
