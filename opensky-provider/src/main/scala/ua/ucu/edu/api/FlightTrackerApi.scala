@@ -5,42 +5,70 @@ import org.opensky.api.OpenSkyApi.BoundingBox
 import org.opensky.model.OpenSkyStates
 import org.slf4j.{Logger, LoggerFactory}
 import ua.ucu.edu.model.FlightTrackerState
+import scala.util.Random
+
 
 import scala.collection.JavaConverters._
 
 class FlightTrackerApi {
-
+  val random = new Random
   val logger: Logger = LoggerFactory.getLogger(getClass)
 
   // Free API instance
   val api = new OpenSkyApi("rzatserkovnyi", "Bh2LZa6Wim3mUXF")
 
+//  def getStates: List[FlightTrackerState] = {
+//    val flightTrackerStates = FlightTrackerApi.cities.flatMap {
+//      case (city, bbox) =>
+//        logger.info(s"Calling API for $city")
+//        val response: OpenSkyStates = api.getStates(0, null, bbox)
+//        if (response == null || response.getStates == null)
+//          logger.info("Got response with 0 states")
+//        else
+//          logger.info(s"Got response with ${response.getStates.size} states")
+//        val cityStates: List[FlightTrackerState] =
+//          if (response == null || response.getStates == null) List()
+//          else response.getStates.asScala.toList.map(state => FlightTrackerState(
+//            response.getTime,
+//            state.getLatitude,
+//            state.getLongitude,
+//            city,
+//            state.getCallsign,
+//            state.getOriginCountry
+//          ))
+//        // Prevent API throttling
+//        Thread.sleep(6 * 1000)
+//        cityStates
+//    }
+//    logger.info(s"Total: ${flightTrackerStates.size} states")
+//    flightTrackerStates.toList
+//  }
+
   def getStates: List[FlightTrackerState] = {
-    val flightTrackerStates = FlightTrackerApi.cities.flatMap {
-      case (city, bbox) =>
-        logger.info(s"Calling API for $city")
-        val response: OpenSkyStates = api.getStates(0, null, bbox)
-        if (response == null || response.getStates == null)
-          logger.info("Got response with 0 states")
-        else
-          logger.info(s"Got response with ${response.getStates.size} states")
-        val cityStates: List[FlightTrackerState] =
-          if (response == null || response.getStates == null) List()
-          else response.getStates.asScala.toList.map(state => FlightTrackerState(
-            response.getTime,
-            state.getLatitude,
-            state.getLongitude,
-            city,
-            state.getCallsign,
-            state.getOriginCountry
-          ))
-        // Prevent API throttling
-        Thread.sleep(6 * 1000)
-        cityStates
-    }
-    logger.info(s"Total: ${flightTrackerStates.size} states")
-    flightTrackerStates.toList
+    val index = random.nextInt(FlightTrackerApi.cities.size)
+    val city: String = FlightTrackerApi.indexCity(index)
+    val bbox: BoundingBox = FlightTrackerApi.cities(city)
+
+    logger.info(s"Calling API for $city")
+    val response: OpenSkyStates = api.getStates(0, null, bbox)
+    if (response == null || response.getStates == null)
+      logger.info("Got response with 0 states")
+    else
+      logger.info(s"Got response with ${response.getStates.size} states")
+    val cityStates: List[FlightTrackerState] =
+      if (response == null || response.getStates == null) List()
+      else response.getStates.asScala.toList.map(state => FlightTrackerState(
+        response.getTime,
+        state.getLatitude,
+        state.getLongitude,
+        city,
+        state.getCallsign,
+        state.getOriginCountry
+      ))
+
+    cityStates
   }
+
 }
 
 object FlightTrackerApi {
@@ -56,5 +84,31 @@ object FlightTrackerApi {
     "Madrid" -> new BoundingBox(40.2039, 40.67134, -4.0480, -3.2057),
     "Barcelona" -> new BoundingBox(41.1627, 41.5670, 1.6084, 2.4836),
     "Rome" -> new BoundingBox(41.5083, 42.1790, 11.9569, 41.5083)
+  )
+
+  def indexCity: Map[Int, String] = Map(
+    0 -> "London",
+    1 -> "Munich",
+    2 -> "Warsaw",
+    3 -> "Prague",
+    4 -> "Paris",
+    5 -> "Brussels",
+    6 -> "Amsterdam",
+    7 -> "Madrid",
+    8 -> "Barcelona",
+    9 -> "Rome"
+  )
+
+  def cityIndex: Map[String, Int] = Map(
+    "London" -> 0,
+    "Munich" -> 1,
+    "Warsaw" -> 2,
+    "Prague" -> 3,
+    "Paris" -> 4,
+    "Brussels" -> 5,
+    "Amsterdam" -> 6,
+    "Madrid" -> 7,
+    "Barcelona" -> 8,
+    "Rome" -> 9
   )
 }
